@@ -1,0 +1,25 @@
+# recovery mlv5_product init rc
+on init
+    mkdir /cust
+    mkdir /OP
+    chown system system /persist-lg
+    chmod 0775 /persist-lg
+    symlink /dev/block/platform/mtk-msdc.0/11230000.msdc0/by-name/misc2 /dev/misc2
+    symlink /dev/block/platform/mtk-msdc.0/11230000.msdc0/by-name/ftm /dev/ftm
+
+on fs
+    mount ext4 /dev/block/platform/mtk-msdc.0/11230000.msdc0/by-name/system /system ro wait
+    mount ext4 /dev/block/platform/mtk-msdc.0/11230000.msdc0/by-name/cust /cust rw noatime nosuid nodev wait commit=1,nodelalloc,noauto_da_alloc
+    mount ext4 /dev/block/platform/mtk-msdc.0/11230000.msdc0/by-name/OP /OP rw noatime nosuid nodev wait barrier=1,data=ordered,noauto_da_alloc,context=u:object_r:op_file:s0
+    mount ext4 /dev/block/platform/mtk-msdc.0/11230000.msdc0/by-name/persist_lg /persist-lg noatime nosuid nodev wait commit=1,nodelalloc,noauto_da_alloc
+    restorecon_recursive /system
+    restorecon_recursive /cust
+    restorecon_recursive /OP
+    restorecon_recursive /persist-lg
+
+on post-fs
+    chown system system /cust
+    chmod 0775 /cust
+    chown system system /OP
+    chmod 0775 /OP
+
